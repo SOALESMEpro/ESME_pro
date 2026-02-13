@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Manager Pro — Enhanced v2</title>
+   
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+   
+    <style>
+        :root {
+            --primary: #6366F1;
+            --primary-light: #818CF8;
+            --primary-dark: #4F46E5;
+            --accent: #F59E0B;
+            --accent-green: #10B981;
+            --accent-red: #EF4444;
+            --accent-purple: #A855F7;
+            --accent-cyan: #06B6D4;
+            --bg: #0F0F14;
+            --bg-elevated: #18181F;
+            --bg-card: #1C1C24;
+            --bg-card-hover: #24242E;
+            --border: rgba(255,255,255,0.08);
+            --border-focus: rgba(99,102,241,0.3);
+            --text: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --text-tertiary: #6B7280;
+            --shadow: 0 20px 50px rgba(0,0,0,0.4);
+            --glow: 0 0 30px rgba(99,102,241,0.2);
+        }
+
+        [data-theme="light"] {
+            --bg: #F8F9FC;
+            --bg-elevated: #FFFFFF;
+            --bg-card: #FFFFFF;
+            --bg-card-hover: #F3F4F6;
+            --border: rgba(0,0,0,0.08);
+            --border-focus: rgba(99,102,241,0.3);
+            --text: #111827;
+            --text-secondary: #6B7280;
+            --text-tertiary: #9CA3AF;
+            --shadow: 0 4px 24px rgba(0,0,0,0.06);
+            --glow: 0 0 30px rgba(99,102,241,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(99,102,241,0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(245,158,11,0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        nav {
+            width: 280px;
+            background: var(--bg-elevated);
+            border-right: 1px solid var(--border);
+            padding: 32px 24px;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+
+        .nav-logo {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 48px; padding: 0 8px;
+        }
+
+        .nav-logo-icon {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: var(--glow);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+        }
+
+        .nav-logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px;
+        }
+
+        .nav-logo-text span {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-section {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin: 24px 0 12px; padding: 0 12px;
+        }
+
+        .nav-btn {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 16px; margin-bottom: 6px;
+            background: transparent; border: 1px solid transparent;
+            border-radius: 12px; color: var(--text-secondary);
+            font-size: 0.95rem; font-weight: 500;
+            cursor: pointer; transition: all 0.2s;
+            position: relative; overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: ''; position: absolute;
+            left: 0; top: 0; bottom: 0; width: 3px;
+            background: var(--primary);
+            transform: scaleY(0); transition: transform 0.2s;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-btn:hover { background: var(--bg-card); color: var(--text); transform: translateX(2px); }
+        .nav-btn.active { background: var(--bg-card); color: var(--primary); border-color: var(--border-focus); }
+        .nav-btn.active::before { transform: scaleY(1); }
+        .nav-icon { font-size: 1.3rem; width: 24px; text-align: center; }
+
+        .theme-toggle {
+            margin-top: auto; padding: 16px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: all 0.2s;
+        }
+
+        .theme-toggle:hover { border-color: var(--border-focus); }
+        .theme-label { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 500; }
+
+        .toggle-switch {
+            width: 44px; height: 24px; background: var(--bg);
+            border-radius: 100px; position: relative; transition: all 0.3s;
+        }
+
+        .toggle-switch::after {
+            content: ''; position: absolute;
+            top: 3px; left: 3px; width: 18px; height: 18px;
+            background: var(--text-secondary); border-radius: 50%; transition: all 0.3s;
+        }
+
+        [data-theme="light"] .toggle-switch { background: var(--primary); }
+        [data-theme="light"] .toggle-switch::after { left: 23px; background: white; }
+
+        main {
+            margin-left: 280px; flex: 1;
+            padding: 40px; position: relative; z-index: 1;
+        }
+
+        .section { display: none; animation: fadeIn 0.4s ease; }
+        .section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header { margin-bottom: 40px; }
+
+        .page-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em;
+            color: var(--primary); margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .page-meta::before { content: ''; width: 24px; height: 2px; background: var(--primary); }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .page-description { font-size: 1.05rem; color: var(--text-secondary); max-width: 600px; }
+
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 20px; padding: 28px; margin-bottom: 24px;
+            box-shadow: var(--shadow); transition: all 0.3s;
+        }
+
+        .card:hover { border-color: var(--border-focus); transform: translateY(-2px); }
+
+        .card-title {
+            font-size: 1.1rem; font-weight: 700; margin-bottom: 24px;
+            display: flex; align-items: center; gap: 12px;
+        }
+
+        .card-title::before {
+            content: ''; width: 4px; height: 20px;
+            background: linear-gradient(180deg, var(--primary), var(--primary-light));
+            border-radius: 2px;
+        }
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px; margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 20px; padding: 28px;
+            position: relative; overflow: hidden;
+            transition: all 0.3s; cursor: default;
+        }
+
+        .stat-card::before {
+            content: ''; position: absolute;
+            top: 0; right: 0; width: 120px; height: 120px;
+            background: var(--primary); opacity: 0.05; border-radius: 50%;
+            transform: translate(30%, -30%); transition: all 0.3s;
+        }
+
+        .stat-card:hover { border-color: var(--border-focus); transform: translateY(-4px); box-shadow: var(--glow); }
+        .stat-card:hover::before { transform: translate(30%, -30%) scale(1.2); opacity: 0.08; }
+
+        .stat-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+            color: var(--text-tertiary); margin-bottom: 12px;
+        }
+
+        .stat-value { font-size: 3rem; font-weight: 800; line-height: 1; margin-bottom: 8px; }
+        .stat-sub { font-size: 0.9rem; color: var(--text-secondary); }
+        .stat-bar { margin-top: 16px; height: 6px; background: var(--bg); border-radius: 100px; overflow: hidden; }
+        .stat-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); border-radius: 100px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .ue-overview {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px; margin-bottom: 32px;
+        }
+
+        .ue-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 20px; transition: all 0.3s;
+            position: relative; overflow: hidden;
+        }
+
+        .ue-card::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0); transition: transform 0.3s;
+        }
+
+        .ue-card:hover { border-color: var(--border-focus); transform: translateY(-2px); }
+        .ue-card:hover::after { transform: scaleX(1); }
+        .ue-code { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--primary); margin-bottom: 6px; font-weight: 600; }
+        .ue-name { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.3; }
+        .ue-average { font-size: 2.2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+
+        .today-schedule { display: flex; flex-direction: column; gap: 12px; }
+
+        .course-item {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px;
+            display: flex; align-items: flex-start; gap: 14px; transition: all 0.3s;
+        }
+
+        .course-item:hover { border-color: var(--border-focus); }
+        .course-item.current { border-color: var(--accent-green); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+        .course-item.next { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+
+        .course-time-block { display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+        .course-start { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 700; color: var(--primary); }
+        .course-end { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-tertiary); }
+        .course-details { flex: 1; min-width: 0; }
+        .course-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+        .course-title { font-weight: 600; font-size: 0.95rem; }
+
+        .time-badge {
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 0.7rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+        }
+
+        .time-badge.current { background: var(--accent-green); color: white; }
+        .time-badge.soon { background: var(--accent-red); color: white; }
+        .time-badge.upcoming { background: var(--accent); color: white; }
+        .time-badge.later { background: var(--bg-card); color: var(--text-tertiary); border: 1px solid var(--border); }
+
+        .resource-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+
+        .filter-btn {
+            padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border);
+            background: var(--bg); color: var(--text-secondary);
+            font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+
+        .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .filter-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+        .resource-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px; background: var(--bg);
+            border: 1px solid var(--border); border-radius: 12px;
+            margin-bottom: 10px; transition: all 0.2s;
+        }
+
+        .resource-item:hover { border-color: var(--border-focus); transform: translateX(4px); }
+        .resource-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: white; }
+        .resource-content { flex: 1; min-width: 0; }
+        .resource-subject { font-size: 0.75rem; color: var(--text-tertiary); margin-bottom: 2px; }
+        .resource-title { font-weight: 600; font-size: 0.9rem; }
+        .resource-category { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+        /* ==================== RESOURCES V2 ==================== */
+        .res-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .res-search-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 16px;
+            flex: 1;
+            min-width: 220px;
+            transition: all 0.2s;
+        }
+
+        .res-search-wrap:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+        }
+
+        .res-search-icon { font-size: 1rem; color: var(--text-tertiary); }
+
+        .res-search-wrap input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .res-search-wrap input:focus { outline: none; box-shadow: none; }
+
+        /* UE TABS */
+        .res-ue-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .res-ue-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .res-ue-tab:hover { border-color: var(--border-focus); color: var(--text); transform: translateY(-1px); }
+
+        .res-ue-tab.active {
+            background: var(--bg-card);
+            border-color: var(--primary);
+            color: var(--text);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+        }
+
+        .res-ue-tab-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .res-ue-tab-count {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .res-ue-tab.active .res-ue-tab-count {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* UE BLOCK */
+        .res-ue-block {
+            margin-bottom: 28px;
+        }
+
+        .res-ue-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .res-ue-header:hover { border-color: var(--border-focus); }
+
+        .res-ue-stripe {
+            width: 5px; height: 36px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .res-ue-header-info { flex: 1; }
+
+        .res-ue-header-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 3px;
+        }
+
+        .res-ue-header-name {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .res-ue-header-stats {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .res-ue-badge {
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text-secondary);
+        }
+
+        .res-ue-chevron {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            transition: transform 0.25s;
+        }
+
+        .res-ue-block.collapsed .res-ue-chevron { transform: rotate(-90deg); }
+        .res-ue-block.collapsed .res-ue-body { display: none; }
+
+        .res-ue-body { padding-left: 0; }
+
+        /* MODULE BLOCK */
+        .res-module-block {
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .res-module-block:hover { border-color: var(--border-focus); }
+
+        .res-module-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .res-module-header:hover { background: var(--bg-card-hover); }
+
+        .res-module-icon {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .res-module-name {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .res-module-sem {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-tertiary);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 3px 8px;
+            border-radius: 5px;
+        }
+
+        .res-module-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            min-width: 20px;
+            text-align: right;
+        }
+
+        .res-module-chevron {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            transition: transform 0.2s;
+        }
+
+        .res-module-block.collapsed .res-module-chevron { transform: rotate(-90deg); }
+        .res-module-block.collapsed .res-module-body { display: none; }
+
+        .res-module-body {
+            background: var(--bg);
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* RESOURCE ROW */
+        .res-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .res-row:hover {
+            border-color: var(--border-focus);
+            transform: translateX(4px);
+        }
+
+        .res-cat-pill {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 7px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .res-row-title {
+            flex: 1;
+            font-size: 0.88rem;
+            font-weight: 500;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .res-row-open {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            background: rgba(99,102,241,0.08);
+            border: 1px solid rgba(99,102,241,0.2);
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .res-row-open:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .res-empty-module {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 0.83rem;
+        }
+
+        .res-empty-ue {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--text-tertiary);
+        }
+
+        .res-empty-ue-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
+        .res-empty-ue-text { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+        .res-empty-ue-sub { font-size: 0.85rem; }
+
+        .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        input, select {
+            font-family: 'Outfit', sans-serif; font-size: 0.9rem;
+            padding: 12px 16px; background: var(--bg);
+            border: 1px solid var(--border); border-radius: 10px;
+            color: var(--text); transition: all 0.2s;
+        }
+
+        input::placeholder { color: var(--text-tertiary); }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+        .input-grow { flex: 1; min-width: 200px; }
+
+        .btn {
+            font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 600;
+            padding: 12px 24px; border: none; border-radius: 10px;
+            cursor: pointer; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white; box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .btn-secondary { background: var(--bg-card); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-card-hover); border-color: var(--border-focus); }
+
+        .btn-today {
+            background: rgba(99,102,241,0.12);
+            color: var(--primary);
+            border: 1px solid var(--border-focus);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-top: 10px;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: all 0.2s;
+            animation: pulseToday 2s ease-in-out infinite;
+        }
+        .btn-today:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+            animation: none;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+        }
+        @keyframes pulseToday {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.35); }
+            50%       { box-shadow: 0 0 0 7px rgba(99,102,241,0); }
+        }
+
+        .btn-danger {
+            background: transparent; color: var(--accent-red);
+            border: 1px solid rgba(239,68,68,0.3); padding: 8px 16px; font-size: 0.8rem;
+        }
+
+        .btn-danger:hover { background: rgba(239,68,68,0.1); }
+
+        .ue-tabs {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 12px; margin-bottom: 24px;
+        }
+
+        .ue-tab {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 16px; cursor: pointer;
+            transition: all 0.2s; text-align: left;
+        }
+
+        .ue-tab:hover { border-color: var(--border-focus); transform: translateY(-2px); }
+        .ue-tab.active { background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(99,102,241,0.05)); border-color: var(--primary); }
+        .ue-tab-code { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--primary); margin-bottom: 6px; }
+        .ue-tab-name { font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
+        .ue-tab-ects { font-size: 0.75rem; color: var(--text-tertiary); }
+
+        .modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+
+        .module-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; transition: all 0.3s; }
+        .module-card:hover { border-color: var(--border-focus); transform: translateY(-2px); }
+        .module-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+        .module-name { font-size: 0.95rem; font-weight: 600; flex: 1; line-height: 1.4; }
+        .module-sem { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--text-tertiary); background: var(--bg); padding: 4px 10px; border-radius: 6px; }
+        .module-grades { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; min-height: 32px; }
+
+        .grade-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px; background: var(--bg);
+            border: 1px solid var(--border); border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+        }
+
+        .grade-chip.high { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); color: var(--accent-green); }
+        .grade-chip.mid { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); color: var(--accent); }
+        .grade-chip.low { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); color: var(--accent-red); }
+        .grade-type { color: var(--text-tertiary); font-size: 0.7rem; }
+        .grade-del { cursor: pointer; opacity: 0.5; transition: opacity 0.2s; }
+        .grade-del:hover { opacity: 1; color: var(--accent-red); }
+        .module-average { display: flex; align-items: center; gap: 12px; }
+        .avg-label { font-size: 0.75rem; color: var(--text-tertiary); }
+        .avg-bar { flex: 1; height: 4px; background: var(--bg); border-radius: 100px; overflow: hidden; }
+        .avg-bar-fill { height: 100%; border-radius: 100px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .avg-value { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 600; min-width: 40px; text-align: right; }
+
+        .task-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; transition: all 0.2s; }
+        .task-item:hover { border-color: var(--border-focus); }
+        .task-item.done { opacity: 0.5; }
+        .task-check { width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .task-check:hover { border-color: var(--primary); }
+        .task-item.done .task-check { background: var(--primary); border-color: var(--primary); }
+        .task-text { flex: 1; cursor: pointer; }
+        .task-item.done .task-text { text-decoration: line-through; color: var(--text-tertiary); }
+
+        .week-nav { display: flex; align-items: center; justify-content: space-between; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+        .week-info { text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .week-number { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--primary); margin-bottom: 8px; }
+        .week-dates { font-size: 1.2rem; font-weight: 700; }
+        .schedule-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+        .day-column { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; min-height: 200px; }
+        .day-header { background: var(--bg); padding: 14px; text-align: center; border-bottom: 1px solid var(--border); }
+        .day-name { font-size: 0.75rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; }
+        .day-date { font-size: 0.9rem; font-weight: 700; }
+        .day-body { padding: 12px; }
+
+        .course-slot {
+            background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2);
+            border-radius: 10px; padding: 12px; margin-bottom: 8px; position: relative;
+            cursor: pointer; transition: all 0.2s;
+        }
+
+        .course-slot:hover { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.3); }
+        .course-slot:hover::after { content: '🗑️ Supprimer'; position: absolute; top: 4px; right: 8px; font-size: 0.65rem; color: var(--accent-red); }
+        .course-time { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--primary); margin-bottom: 6px; }
+        .course-name { font-weight: 600; font-size: 0.85rem; margin-bottom: 4px; }
+        .course-loc { font-size: 0.75rem; color: var(--text-tertiary); }
+
+        /* ==================== ICS IMPORT PANEL ==================== */
+        .ics-panel {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+
+        .ics-progress {
+            margin-top: 12px;
+            display: none;
+        }
+
+        .ics-progress-bar {
+            height: 4px;
+            background: var(--bg-card);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .ics-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 100px;
+            animation: icsLoading 1.5s ease-in-out infinite;
+        }
+
+        @keyframes icsLoading {
+            0% { width: 5%; }
+            50% { width: 80%; }
+            100% { width: 95%; }
+        }
+
+        .ics-status-msg {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .ics-status-ok { color: var(--accent-green) !important; }
+        .ics-status-err { color: var(--accent-red) !important; }
+        .ics-status-warn { color: var(--accent) !important; }
+
+        .proxy-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .proxy-chip {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-family: 'JetBrains Mono', monospace;
+            border: 1px solid var(--border);
+            color: var(--text-tertiary);
+            transition: all 0.2s;
+        }
+
+        .proxy-chip.trying { border-color: var(--accent); color: var(--accent); background: rgba(245,158,11,0.05); }
+        .proxy-chip.ok { border-color: var(--accent-green); color: var(--accent-green); background: rgba(16,185,129,0.05); }
+        .proxy-chip.fail { border-color: var(--accent-red); color: var(--accent-red); background: rgba(239,68,68,0.05); text-decoration: line-through; opacity: 0.5; }
+
+        #toast {
+            position: fixed; bottom: 32px; right: 32px;
+            background: var(--bg-card); border: 1px solid var(--border-focus);
+            border-radius: 12px; padding: 16px 24px;
+            box-shadow: var(--glow); display: none;
+            z-index: 1000; animation: slideUp 0.3s ease;
+            max-width: 360px;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 1024px) {
+            nav { width: 240px; }
+            main { margin-left: 240px; }
+        }
+
+        @media (max-width: 768px) {
+            nav { transform: translateX(-100%); }
+            main { margin-left: 0; padding: 24px; }
+            .stats-grid, .ue-overview, .ue-tabs, .schedule-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-logo">
+            <div class="nav-logo-icon">🎓</div>
+            <div class="nav-logo-text">ESME<span>Pro</span></div>
+        </div>
+
+        <div class="nav-section">Navigation</div>
+        <button class="nav-btn active" onclick="showSection('dashboard', this)">
+            <span class="nav-icon">◆</span>
+            Tableau de bord
+        </button>
+        <button class="nav-btn" onclick="showSection('grades', this)">
+            <span class="nav-icon">◈</span>
+            Notes & Moyennes
+        </button>
+        <button class="nav-btn" onclick="showSection('schedule', this)">
+            <span class="nav-icon">◧</span>
+            Emploi du temps
+        </button>
+        <button class="nav-btn" onclick="showSection('resources', this)">
+            <span class="nav-icon">◪</span>
+            Ressources
+        </button>
+
+        <div class="theme-toggle" onclick="toggleTheme()">
+            <div class="theme-label">
+                <span id="theme-icon">🌙</span>
+                <span id="theme-text">Mode Sombre</span>
+            </div>
+            <div class="toggle-switch"></div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="section active">
+            <div class="page-header">
+                <div class="page-meta">Vue d'ensemble</div>
+                <h1 class="page-title">Tableau de bord</h1>
+                <p class="page-description">Suivi de ton parcours académique à l'ESME</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Moyenne Générale</div>
+                    <div class="stat-value" id="global-avg" style="color: var(--primary)">—</div>
+                    <div class="stat-sub">/ 20</div>
+                    <div class="stat-bar"><div class="stat-bar-fill" id="global-bar" style="width: 0%"></div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Notes enregistrées</div>
+                    <div class="stat-value" id="total-grades" style="color: var(--accent)">0</div>
+                    <div class="stat-sub">dans tous les modules</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Tâches en cours</div>
+                    <div class="stat-value" id="pending-tasks" style="color: var(--accent-green)">0</div>
+                    <div class="stat-sub">à compléter</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📅 Cours aujourd'hui</div>
+                <div class="today-schedule" id="todaySchedule">
+                    <div style="padding: 40px; text-align: center; color: var(--text-tertiary);">Aucun cours programmé aujourd'hui</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Aperçu des UE</div>
+                <div class="ue-overview">
+                    <div class="ue-card"><div class="ue-code">UE1</div><div class="ue-name">Sciences Fondamentales</div><div class="ue-average" id="dash-ue1">—</div></div>
+                    <div class="ue-card"><div class="ue-code">UE2</div><div class="ue-name">Énergie & Climat</div><div class="ue-average" id="dash-ue2">—</div></div>
+                    <div class="ue-card"><div class="ue-code">UE3</div><div class="ue-name">Tech. & Langages</div><div class="ue-average" id="dash-ue3">—</div></div>
+                    <div class="ue-card"><div class="ue-code">UE4</div><div class="ue-name">Projet Personnel</div><div class="ue-average" id="dash-ue4">—</div></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Tâches & Devoirs</div>
+                <div class="form-row">
+                    <input type="text" id="taskInput" class="input-grow" placeholder="Ajouter une nouvelle tâche...">
+                    <button class="btn btn-primary" onclick="addTask()">+ Ajouter</button>
+                </div>
+                <div id="taskList" style="margin-top: 20px;"></div>
+            </div>
+        </section>
+
+        <!-- GRADES -->
+        <section id="grades" class="section">
+            <div class="page-header">
+                <div class="page-meta">Gestion académique</div>
+                <h1 class="page-title">Notes & Moyennes</h1>
+                <p class="page-description">Suivi détaillé par Unité d'Enseignement</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Ajouter une note</div>
+                <div class="form-row">
+                    <select id="gradeUE" style="width: 120px;">
+                        <option value="ue1">UE1</option><option value="ue2">UE2</option>
+                        <option value="ue3">UE3</option><option value="ue4">UE4</option>
+                    </select>
+                    <select id="gradeSubject" class="input-grow"><option value="">— Module —</option></select>
+                    <input type="number" id="gradeValue" placeholder="Note /20" min="0" max="20" step="0.5" style="width: 120px;">
+                    <select id="gradeType" style="width: 140px;">
+                        <option value="CC">CC</option><option value="Quiz">Quiz</option>
+                        <option value="Midterm">Midterm</option><option value="Final">Final</option>
+                        <option value="TP">TP</option><option value="Projet">Projet</option><option value="Oral">Oral</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="addGrade()">+ Enregistrer</button>
+                </div>
+            </div>
+
+            <div class="ue-tabs">
+                <button class="ue-tab active" onclick="switchUE('ue1', this)">
+                    <div class="ue-tab-code">UE1</div><div class="ue-tab-name">Sciences Fondamentales</div><div class="ue-tab-ects">20 ECTS</div>
+                </button>
+                <button class="ue-tab" onclick="switchUE('ue2', this)">
+                    <div class="ue-tab-code">UE2</div><div class="ue-tab-name">Énergie & Climat</div><div class="ue-tab-ects">15 ECTS</div>
+                </button>
+                <button class="ue-tab" onclick="switchUE('ue3', this)">
+                    <div class="ue-tab-code">UE3</div><div class="ue-tab-name">Technologies & Langages</div><div class="ue-tab-ects">15 ECTS</div>
+                </button>
+                <button class="ue-tab" onclick="switchUE('ue4', this)">
+                    <div class="ue-tab-code">UE4</div><div class="ue-tab-name">Projet Personnel</div><div class="ue-tab-ects">10 ECTS</div>
+                </button>
+            </div>
+
+            <div class="ue-panel active" id="panel-ue1">
+                <div class="card">
+                    <div class="card-title">UE1 — Sciences fondamentales pour l'ingénieur<span style="margin-left: auto; font-size: 1.8rem; font-family: 'JetBrains Mono', monospace;" id="avg-ue1">—</span></div>
+                    <div class="modules-grid" id="modules-ue1"></div>
+                </div>
+            </div>
+            <div class="ue-panel" id="panel-ue2">
+                <div class="card">
+                    <div class="card-title">UE2 — Sciences appliquées aux enjeux Énergie - Climat<span style="margin-left: auto; font-size: 1.8rem; font-family: 'JetBrains Mono', monospace;" id="avg-ue2">—</span></div>
+                    <div class="modules-grid" id="modules-ue2"></div>
+                </div>
+            </div>
+            <div class="ue-panel" id="panel-ue3">
+                <div class="card">
+                    <div class="card-title">UE3 — Technologies et Langages pour l'Ingénieur<span style="margin-left: auto; font-size: 1.8rem; font-family: 'JetBrains Mono', monospace;" id="avg-ue3">—</span></div>
+                    <div class="modules-grid" id="modules-ue3"></div>
+                </div>
+            </div>
+            <div class="ue-panel" id="panel-ue4">
+                <div class="card">
+                    <div class="card-title">UE4 — Projet Personnel et Professionnel<span style="margin-left: auto; font-size: 1.8rem; font-family: 'JetBrains Mono', monospace;" id="avg-ue4">—</span></div>
+                    <div class="modules-grid" id="modules-ue4"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCHEDULE -->
+        <section id="schedule" class="section">
+            <div class="page-header">
+                <div class="page-meta">Organisation</div>
+                <h1 class="page-title">Emploi du temps</h1>
+                <p class="page-description">Planification hebdomadaire</p>
+            </div>
+
+            <!-- ICS IMPORT - FIXED -->
+            <div class="card">
+                <div class="card-title">📥 Importer depuis Alcuin (ICS)</div>
+                <div class="form-row">
+                    <input type="url" id="icsUrl" class="input-grow"
+                        placeholder="https://connecteur.alcuin.com/ADS/ESME.mvc/api/ics/votre-uuid">
+                    <button class="btn btn-primary" id="importBtn" onclick="importICS()">📥 Importer</button>
+                    <button class="btn btn-secondary" id="refreshBtn" onclick="refreshICS()" style="display:none;">🔄 Actualiser</button>
+                    <button class="btn btn-secondary" onclick="clearSchedule()">🗑️ Effacer tout</button>
+                </div>
+
+                <div class="ics-panel">
+                    <div class="ics-status-msg" id="icsStatusMsg">
+                        Entrez votre lien ICS Alcuin ci-dessus et cliquez sur Importer.
+                    </div>
+                    <div class="ics-progress" id="icsProgress">
+                        <div class="ics-progress-bar"><div class="ics-progress-fill"></div></div>
+                        <div class="ics-status-msg" id="icsProgressMsg">Connexion en cours...</div>
+                    </div>
+                    <div class="proxy-chips" id="proxyChips"></div>
+                </div>
+            </div>
+
+            <!-- Manual Add -->
+            <div class="card">
+                <div class="card-title">✏️ Ajouter manuellement</div>
+                <div class="form-row">
+                    <input type="text" id="schedCourse" placeholder="Cours" class="input-grow">
+                    <input type="date" id="schedDate" style="width: 160px;">
+                    <input type="time" id="schedStart" style="width: 100px;">
+                    <input type="time" id="schedEnd" style="width: 100px;">
+                    <input type="text" id="schedLocation" placeholder="Salle" style="width: 140px;">
+                    <button class="btn btn-primary" onclick="addCourse()">+ Ajouter</button>
+                </div>
+            </div>
+
+            <!-- Week Navigation -->
+            <div class="week-nav">
+                <button class="btn btn-secondary" onclick="changeWeek(-1)">← Semaine précédente</button>
+                <div class="week-info">
+                    <div class="week-number" id="weekNum">Semaine —</div>
+                    <div class="week-dates" id="weekDates">—</div>
+                    <button class="btn btn-today" id="todayBtn" onclick="goToToday()" style="display:none;">◉ Aujourd'hui</button>
+                </div>
+                <button class="btn btn-secondary" onclick="changeWeek(1)">Semaine suivante →</button>
+            </div>
+
+            <div class="schedule-grid" id="scheduleGrid"></div>
+        </section>
+
+        <!-- RESOURCES -->
+        <section id="resources" class="section">
+            <div class="page-header">
+                <div class="page-meta">Bibliotheque</div>
+                <h1 class="page-title">Ressources</h1>
+                <p class="page-description">Tous tes supports organises par UE et matiere</p>
+            </div>
+
+            <div class="card res-add-card">
+                <div class="card-title">Ajouter une ressource</div>
+                <div class="form-row" style="margin-bottom: 12px;">
+                    <select id="resUE" style="width: 110px;" onchange="updateResModuleSelect()">
+                        <option value="ue1">UE1</option>
+                        <option value="ue2">UE2</option>
+                        <option value="ue3">UE3</option>
+                        <option value="ue4">UE4</option>
+                    </select>
+                    <select id="resModule" style="width: 260px;"><option value="">— Matière —</option></select>
+                    <select id="resCategory" style="width: 140px;">
+                        <option value="cm">📖 CM</option>
+                        <option value="td">✏️ TD</option>
+                        <option value="tp">🧪 TP</option>
+                        <option value="fiche">📝 Fiche</option>
+                        <option value="exam">🎓 Examen</option>
+                        <option value="autre">📁 Autre</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <input type="text" id="resTitle" placeholder="Titre de la ressource" class="input-grow">
+                    <input type="url" id="resLink" placeholder="https://..." class="input-grow">
+                    <button class="btn btn-primary" onclick="addResource()">+ Ajouter</button>
+                </div>
+            </div>
+
+            <div class="res-toolbar">
+                <div class="res-search-wrap">
+                    <span class="res-search-icon">&#128269;</span>
+                    <input type="text" id="resSearch" placeholder="Rechercher une ressource..." oninput="renderResources()">
+                </div>
+                <div class="resource-filters" id="resCatFilters">
+                    <button class="filter-btn active" onclick="filterResources('all', this)">Tout</button>
+                    <button class="filter-btn" onclick="filterResources('cm', this)">CM</button>
+                    <button class="filter-btn" onclick="filterResources('td', this)">TD</button>
+                    <button class="filter-btn" onclick="filterResources('tp', this)">TP</button>
+                    <button class="filter-btn" onclick="filterResources('fiche', this)">Fiches</button>
+                    <button class="filter-btn" onclick="filterResources('exam', this)">Examens</button>
+                    <button class="filter-btn" onclick="filterResources('autre', this)">Autres</button>
+                </div>
+            </div>
+
+            <div class="res-ue-tabs" id="resUETabs">
+                <button class="res-ue-tab active" onclick="filterResUE('all', this)">
+                    <span class="res-ue-tab-dot" style="background: var(--primary)"></span>
+                    Toutes les UE
+                    <span class="res-ue-tab-count" id="res-count-all">0</span>
+                </button>
+                <button class="res-ue-tab" onclick="filterResUE('ue1', this)">
+                    <span class="res-ue-tab-dot" style="background: #6366F1"></span>
+                    UE1
+                    <span class="res-ue-tab-count" id="res-count-ue1">0</span>
+                </button>
+                <button class="res-ue-tab" onclick="filterResUE('ue2', this)">
+                    <span class="res-ue-tab-dot" style="background: #06B6D4"></span>
+                    UE2
+                    <span class="res-ue-tab-count" id="res-count-ue2">0</span>
+                </button>
+                <button class="res-ue-tab" onclick="filterResUE('ue3', this)">
+                    <span class="res-ue-tab-dot" style="background: #A855F7"></span>
+                    UE3
+                    <span class="res-ue-tab-count" id="res-count-ue3">0</span>
+                </button>
+                <button class="res-ue-tab" onclick="filterResUE('ue4', this)">
+                    <span class="res-ue-tab-dot" style="background: #F59E0B"></span>
+                    UE4
+                    <span class="res-ue-tab-count" id="res-count-ue4">0</span>
+                </button>
+            </div>
+
+            <div id="resourcesList"></div>
+        </section>
+    </main>
+
+    <div id="toast"></div>
+
+    <script>
+    // ===================== DATA =====================
+    let data = JSON.parse(localStorage.getItem('studentDataV3')) || {
+        grades: [], tasks: [], schedule: [], resources: [], icsUrl: ''
+    };
+
+    let currentWeek = 0;
+    let activeUE = 'ue1';
+    let activeFilter = 'all';
+
+    // ===================== UE STRUCTURE =====================
+    const UE_MODULES = {
+        ue1: [
+            { id: 'maths3', name: 'Mathématiques fondamentales 3', sem: 'S1' },
+            { id: 'outils3', name: 'Outils mathématiques 3', sem: 'S1' },
+            { id: 'analyse', name: 'Introduction à l\'analyse numérique', sem: 'S1' },
+            { id: 'signaux', name: 'Signaux et systèmes', sem: 'S1' },
+            { id: 'maths4', name: 'Mathématiques fondamentales 4', sem: 'S2' },
+            { id: 'outils4', name: 'Outils mathématiques 4', sem: 'S2' },
+            { id: 'em2', name: 'Électromagnétisme 2', sem: 'S2' },
+        ],
+        ue2: [
+            { id: 'systech3', name: 'Systèmes techniques 3', sem: 'S1' },
+            { id: 'mecafluides', name: 'Mécanique des fluides', sem: 'S1' },
+            { id: 'enviro1', name: 'Enjeux Environnementaux 1', sem: 'S1' },
+            { id: 'gprojet1', name: 'Gestion de projet : objectifs SMART', sem: 'S1' },
+            { id: 'systech4', name: 'Systèmes techniques 4', sem: 'S2' },
+            { id: 'ondes', name: 'Ondes électromagnétiques', sem: 'S2' },
+            { id: 'enviro2', name: 'Enjeux Environnementaux 2', sem: 'S2' },
+            { id: 'gprojet2', name: 'Gestion de projet - Énergie-Climat', sem: 'S2' },
+            { id: 'ihm', name: 'Applications avec les IHM', sem: 'S2' },
+        ],
+        ue3: [
+            { id: 'elec1', name: 'Électronique analogique 1', sem: 'S1' },
+            { id: 'algo2', name: 'Algorithmique avancée 2', sem: 'S1' },
+            { id: 'anglais3', name: 'Anglais 3', sem: 'S1' },
+            { id: 'lv23', name: 'LV2 3', sem: 'S1' },
+            { id: 'elec2', name: 'Électronique analogique 2', sem: 'S2' },
+            { id: 'algo3', name: 'Algorithmique avancée 3', sem: 'S2' },
+            { id: 'anglais4', name: 'Anglais 4', sem: 'S2' },
+            { id: 'lv24', name: 'LV2 4', sem: 'S2' },
+        ],
+        ue4: [
+            { id: 'devperso', name: 'Développement personnel', sem: 'S1' },
+            { id: 'gestion1', name: 'Gestion de l\'entreprise 1', sem: 'S1' },
+            { id: 'parcours2', name: 'Parcours d\'ouverture 2', sem: 'S1' },
+            { id: 'gestion2', name: 'Gestion de l\'entreprise 2', sem: 'S2' },
+            { id: 'parcours3', name: 'Parcours d\'ouverture 3', sem: 'S2' },
+            { id: 'stage', name: 'Stage IngéSUP 4 à 8 semaines', sem: 'S2' },
+            { id: 'echos', name: 'ECHOS', sem: 'S2' },
+        ],
+    };
+
+    const RESOURCE_CATEGORIES = {
+        cm: { icon: '📖', color: '#6366F1', label: 'CM' },
+        td: { icon: '✏️', color: '#8B5CF6', label: 'TD' },
+        tp: { icon: '🧪', color: '#06B6D4', label: 'TP' },
+        fiche: { icon: '📝', color: '#F59E0B', label: 'Fiche' },
+        exam: { icon: '🎓', color: '#EF4444', label: 'Examen' },
+        autre: { icon: '📁', color: '#6B7280', label: 'Autre' }
+    };
+
+    // ===================== ICS IMPORT (FIXED) =====================
+
+    // Proxies CORS à essayer dans l'ordre
+    const CORS_PROXIES = [
+        url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+    ];
+
+    const PROXY_NAMES = ['allorigins', 'corsproxy.io', 'codetabs'];
+
+    function setICSStatus(msg, type = '') {
+        const el = document.getElementById('icsStatusMsg');
+        el.textContent = msg;
+        el.className = 'ics-status-msg' + (type ? ' ics-status-' + type : '');
+    }
+
+    function showProgress(show) {
+        document.getElementById('icsProgress').style.display = show ? 'block' : 'none';
+        document.getElementById('importBtn').disabled = show;
+    }
+
+    function updateProxyChip(idx, state) {
+        const chips = document.getElementById('proxyChips');
+        const chip = chips.children[idx];
+        if (chip) chip.className = 'proxy-chip ' + state;
+    }
+
+    function initProxyChips() {
+        const chips = document.getElementById('proxyChips');
+        chips.innerHTML = PROXY_NAMES.map(n =>
+            `<div class="proxy-chip">${n}</div>`
+        ).join('');
+    }
+
+    async function tryFetchICS(url) {
+        initProxyChips();
+
+        for (let i = 0; i < CORS_PROXIES.length; i++) {
+            updateProxyChip(i, 'trying');
+            document.getElementById('icsProgressMsg').textContent =
+                `Tentative via ${PROXY_NAMES[i]}...`;
+
+            try {
+                const proxyUrl = CORS_PROXIES[i](url);
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 10000);
+
+                const response = await fetch(proxyUrl, { signal: controller.signal });
+                clearTimeout(timeout);
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const text = await response.text();
+
+                // Vérification que c'est bien un fichier ICS valide
+                if (!text.includes('BEGIN:VCALENDAR')) {
+                    throw new Error('Réponse non valide (pas un fichier ICS)');
+                }
+
+                updateProxyChip(i, 'ok');
+                return text;
+
+            } catch (err) {
+                updateProxyChip(i, 'fail');
+                console.warn(`Proxy ${PROXY_NAMES[i]} échoué:`, err.message);
+            }
+        }
+
+        throw new Error('Tous les proxies ont échoué. Vérifiez votre connexion ou l\'URL.');
+    }
+
+    // Parser ICS robuste (gestion des lignes de continuation, UTF-8, etc.)
+    function parseICS(icsText) {
+        // Dépliage des lignes de continuation ICS (ligne commençant par espace/tab)
+        const unfolded = icsText.replace(/\r?\n[ \t]/g, '');
+        const lines = unfolded.split(/\r?\n/);
+
+        const events = [];
+        let current = null;
+
+        for (const rawLine of lines) {
+            const line = rawLine.trim();
+
+            if (line === 'BEGIN:VEVENT') {
+                current = {};
+                continue;
+            }
+
+            if (line === 'END:VEVENT') {
+                if (current && current.dtstart && current.summary) {
+                    const parsed = buildEvent(current);
+                    if (parsed) events.push(parsed);
+                }
+                current = null;
+                continue;
+            }
+
+            if (!current) continue;
+
+            // Parsing flexible : PROPERTY;PARAM=val:value ou PROPERTY:value
+            const colonIdx = line.indexOf(':');
+            if (colonIdx === -1) continue;
+
+            const keyPart = line.substring(0, colonIdx).toUpperCase();
+            const value = line.substring(colonIdx + 1);
+
+            // Gestion des propriétés avec paramètres (ex: DTSTART;TZID=Europe/Paris:...)
+            const baseKey = keyPart.split(';')[0];
+            const params = keyPart.includes(';') ? keyPart.substring(keyPart.indexOf(';') + 1) : '';
+
+            switch (baseKey) {
+                case 'DTSTART':
+                    current.dtstart = value;
+                    current.dtstartParams = params;
+                    break;
+                case 'DTEND':
+                    current.dtend = value;
+                    current.dtendParams = params;
+                    break;
+                case 'SUMMARY':
+                    current.summary = decodeICSText(value);
+                    break;
+                case 'LOCATION':
+                    current.location = decodeICSText(value);
+                    break;
+                case 'DESCRIPTION':
+                    current.description = decodeICSText(value);
+                    break;
+            }
+        }
+
+        return events;
+    }
+
+    function decodeICSText(text) {
+        return text
+            .replace(/\\n/g, ' ')
+            .replace(/\\,/g, ',')
+            .replace(/\\;/g, ';')
+            .replace(/\\\\/g, '\\')
+            .trim();
+    }
+
+    function buildEvent(evt) {
+        try {
+            const start = parseICSDate(evt.dtstart, evt.dtstartParams);
+            const end = evt.dtend ? parseICSDate(evt.dtend, evt.dtendParams) : null;
+
+            if (!start) return null;
+
+            // Heure de fin par défaut : 1h après le début
+            const endDate = end || new Date(start.getTime() + 3600000);
+
+            return {
+                course: cleanCourseName(evt.summary),
+                date: toLocalDateString(start),
+                timeStart: toLocalTimeString(start),
+                timeEnd: toLocalTimeString(endDate),
+                location: evt.location || ''
+            };
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function parseICSDate(dateStr, params) {
+        if (!dateStr) return null;
+
+        // Format possible : 20240215T083000Z, 20240215T083000, 20240215
+        const isUTC = dateStr.endsWith('Z');
+        const hasTZID = params && params.includes('TZID=');
+        const clean = dateStr.replace('Z', '');
+
+        const year   = parseInt(clean.substring(0, 4), 10);
+        const month  = parseInt(clean.substring(4, 6), 10) - 1;
+        const day    = parseInt(clean.substring(6, 8), 10);
+
+        let hour = 0, minute = 0, second = 0;
+
+        if (clean.length > 8 && clean.includes('T')) {
+            const tIdx = clean.indexOf('T');
+            const timePart = clean.substring(tIdx + 1);
+            hour   = parseInt(timePart.substring(0, 2), 10) || 0;
+            minute = parseInt(timePart.substring(2, 4), 10) || 0;
+            second = parseInt(timePart.substring(4, 6), 10) || 0;
+        }
+
+        if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+
+        if (isUTC) {
+            // Convertir UTC → heure locale du navigateur
+            return new Date(Date.UTC(year, month, day, hour, minute, second));
+        } else {
+            // Heure locale (ou avec TZID, on fait confiance à l'heure telle quelle)
+            return new Date(year, month, day, hour, minute, second);
+        }
+    }
+
+    function toLocalDateString(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function toLocalTimeString(date) {
+        const h = String(date.getHours()).padStart(2, '0');
+        const m = String(date.getMinutes()).padStart(2, '0');
+        return `${h}:${m}`;
+    }
+
+    function cleanCourseName(summary) {
+        if (!summary) return 'Cours sans titre';
+        let name = summary.trim();
+
+        // Suppression des préfixes école (ex: "ESME - ", "ESME_SUDRIA - ")
+        name = name.replace(/^[A-Z_]+\s*-\s*/i, '');
+
+        // Suppression des codes entre crochets [TD], [CM], [TP]...
+        name = name.replace(/\s*\[(?:TD|CM|TP|DS|CC|EXAM|COURS|AMPHI)[^\]]*\]/gi, '');
+
+        // Suppression des codes alphanumériques en début (ex: "INF301 - ")
+        name = name.replace(/^[A-Z]{2,4}\d{3,4}\s*-?\s*/i, '');
+
+        // Suppression des groupes (Groupe 1, G1, gr1, etc.)
+        name = name.replace(/\s*[-–]?\s*G(?:roupe)?\s*\d+/gi, '');
+        name = name.replace(/\s*[-–]?\s*gr\.?\s*\d+/gi, '');
+
+        // Nettoyage des espaces multiples
+        name = name.replace(/\s+/g, ' ').trim();
+
+        return name || summary.trim();
+    }
+
+    async function importICS() {
+        const url = document.getElementById('icsUrl').value.trim();
+        if (!url) {
+            showToast('⚠️ Veuillez entrer une URL ICS');
+            return;
+        }
+
+        if (!url.startsWith('http')) {
+            setICSStatus('❌ URL invalide. Commencez par https://', 'err');
+            return;
+        }
+
+        showProgress(true);
+        setICSStatus('📡 Connexion à Alcuin...', '');
+
+        try {
+            const icsText = await tryFetchICS(url);
+            document.getElementById('icsProgressMsg').textContent = 'Analyse du calendrier...';
+
+            const events = parseICS(icsText);
+
+            if (events.length === 0) {
+                showProgress(false);
+                setICSStatus('⚠️ Aucun cours trouvé dans ce fichier ICS.', 'warn');
+                return;
+            }
+
+            // Dédoublonnage et ajout
+            let added = 0, skipped = 0;
+            events.forEach(event => {
+                const exists = data.schedule.some(c =>
+                    c.date === event.date &&
+                    c.timeStart === event.timeStart &&
+                    c.course === event.course
+                );
+                if (!exists) { data.schedule.push(event); added++; }
+                else skipped++;
+            });
+
+            data.icsUrl = url;
+            showProgress(false);
+            setICSStatus(
+                `✓ Import réussi : ${added} cours ajoutés${skipped > 0 ? `, ${skipped} doublons ignorés` : ''} (${events.length} événements trouvés)`,
+                'ok'
+            );
+            document.getElementById('refreshBtn').style.display = 'inline-flex';
+            saveData();
+            showToast(`✓ ${added} cours importés !`);
+
+        } catch (err) {
+            showProgress(false);
+            setICSStatus(`❌ ${err.message}`, 'err');
+            showToast('❌ Importation échouée');
+            console.error(err);
+        }
+    }
+
+    function refreshICS() {
+        if (data.icsUrl) {
+            document.getElementById('icsUrl').value = data.icsUrl;
+            // Effacer les anciens et ré-importer
+            data.schedule = data.schedule.filter(c => c._manual);
+            importICS();
+        }
+    }
+
+    function updateICSStatus() {
+        const refreshBtn = document.getElementById('refreshBtn');
+        const urlInput = document.getElementById('icsUrl');
+
+        if (data.icsUrl) {
+            if (!urlInput.value) urlInput.value = data.icsUrl;
+            refreshBtn.style.display = 'inline-flex';
+            setICSStatus(
+                `✓ URL ICS enregistrée — ${data.schedule.length} cours dans le planning`,
+                'ok'
+            );
+        } else {
+            setICSStatus('Entrez votre lien ICS Alcuin ci-dessus et cliquez sur Importer.');
+        }
+    }
+
+    function clearSchedule() {
+        if (confirm('Effacer tout l\'emploi du temps ?')) {
+            data.schedule = [];
+            data.icsUrl = '';
+            document.getElementById('icsUrl').value = '';
+            document.getElementById('refreshBtn').style.display = 'none';
+            document.getElementById('proxyChips').innerHTML = '';
+            setICSStatus('Planning effacé.');
+            saveData();
+            showToast('✓ Planning effacé');
+        }
+    }
+
+    // ===================== SCHEDULE =====================
+    function getMonday(d) {
+        const date = new Date(d);
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(date.setDate(diff));
+    }
+
+    function getWeekDates(offset = 0) {
+        const today = new Date();
+        const monday = getMonday(today);
+        monday.setDate(monday.getDate() + offset * 7);
+        const dates = [];
+        for (let i = 0; i < 5; i++) {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            dates.push(d);
+        }
+        return dates;
+    }
+
+    function formatDate(d) {
+        return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+    }
+
+    function changeWeek(offset) {
+        currentWeek += offset;
+        renderSchedule();
+    }
+
+    function goToToday() {
+        currentWeek = 0;
+        renderSchedule();
+    }
+
+    function addCourse() {
+        const course = document.getElementById('schedCourse').value.trim();
+        const date = document.getElementById('schedDate').value;
+        const start = document.getElementById('schedStart').value;
+        const end = document.getElementById('schedEnd').value;
+        const location = document.getElementById('schedLocation').value.trim();
+        if (course && date && start && end) {
+            data.schedule.push({ course, date, timeStart: start, timeEnd: end, location, _manual: true });
+            ['schedCourse','schedDate','schedStart','schedEnd','schedLocation'].forEach(id => document.getElementById(id).value = '');
+            saveData();
+            showToast('✓ Cours ajouté');
+        }
+    }
+
+    function deleteCourse(idx) {
+        data.schedule.splice(idx, 1);
+        saveData();
+        showToast('✓ Cours supprimé');
+    }
+
+    function renderSchedule() {
+        const dates = getWeekDates(currentWeek);
+        const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+
+        // Numéro de semaine ISO
+        const d = new Date(dates[0]);
+        const dayOfYear = Math.floor((d - new Date(d.getFullYear(), 0, 1)) / 86400000);
+        const weekNum = Math.ceil((dayOfYear + new Date(d.getFullYear(), 0, 1).getDay() + 1) / 7);
+        document.getElementById('weekNum').textContent = `Semaine ${weekNum}`;
+        document.getElementById('weekDates').textContent = `${formatDate(dates[0])} – ${formatDate(dates[4])}`;
+
+        // Afficher le bouton "Aujourd'hui" seulement quand on n'est pas sur la semaine actuelle
+        const todayBtn = document.getElementById('todayBtn');
+        if (todayBtn) todayBtn.style.display = currentWeek !== 0 ? 'inline-flex' : 'none';
+
+        const grid = document.getElementById('scheduleGrid');
+        grid.innerHTML = '';
+
+        dates.forEach((date, i) => {
+            const dateStr = toLocalDateString(date);
+            const courses = data.schedule
+                .filter(c => c.date === dateStr)
+                .sort((a, b) => a.timeStart.localeCompare(b.timeStart));
+
+            let body = '';
+            if (courses.length === 0) {
+                body = '<div style="padding: 20px; text-align: center; color: var(--text-tertiary); font-size: 0.85rem;">Pas de cours</div>';
+            } else {
+                courses.forEach(c => {
+                    const idx = data.schedule.indexOf(c);
+                    body += `
+                        <div class="course-slot" onclick="deleteCourse(${idx})" title="Cliquer pour supprimer">
+                            <div class="course-time">${c.timeStart} – ${c.timeEnd}</div>
+                            <div class="course-name">${c.course}</div>
+                            ${c.location ? `<div class="course-loc">📍 ${c.location}</div>` : ''}
+                        </div>
+                    `;
+                });
+            }
+
+            const isToday = toLocalDateString(date) === toLocalDateString(new Date());
+            grid.innerHTML += `
+                <div class="day-column" ${isToday ? 'style="border-color: var(--primary);"' : ''}>
+                    <div class="day-header" ${isToday ? 'style="background: rgba(99,102,241,0.1);"' : ''}>
+                        <div class="day-name">${days[i]}</div>
+                        <div class="day-date">${formatDate(date)}</div>
+                    </div>
+                    <div class="day-body">${body}</div>
+                </div>
+            `;
+        });
+    }
+
+    // ===================== GRADES =====================
+    function addGrade() {
+        const ueId = document.getElementById('gradeUE').value;
+        const moduleId = document.getElementById('gradeSubject').value;
+        const value = parseFloat(document.getElementById('gradeValue').value);
+        const type = document.getElementById('gradeType').value;
+        if (moduleId && !isNaN(value) && value >= 0 && value <= 20) {
+            const module = UE_MODULES[ueId].find(m => m.id === moduleId);
+            data.grades.push({ ueId, moduleId, moduleName: module.name, value, type });
+            document.getElementById('gradeValue').value = '';
+            saveData();
+            showToast('✓ Note ajoutée');
+        }
+    }
+
+    function deleteGrade(idx) {
+        data.grades.splice(idx, 1);
+        saveData();
+        showToast('✓ Note supprimée');
+    }
+
+    function switchUE(ueId, btn) {
+        activeUE = ueId;
+        document.querySelectorAll('.ue-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.ue-panel').forEach(p => p.classList.remove('active'));
+        btn.closest('.ue-tab').classList.add('active');
+        document.getElementById('panel-' + ueId).classList.add('active');
+        document.getElementById('gradeUE').value = ueId;
+        updateModuleSelect();
+    }
+
+    function updateModuleSelect() {
+        const ueId = document.getElementById('gradeUE').value;
+        const sel = document.getElementById('gradeSubject');
+        sel.innerHTML = '<option value="">— Module —</option>';
+        UE_MODULES[ueId].forEach(m => {
+            sel.innerHTML += `<option value="${m.id}">${m.name}</option>`;
+        });
+    }
+
+    document.getElementById('gradeUE').addEventListener('change', updateModuleSelect);
+
+    function getGradeClass(v) { return v >= 14 ? 'high' : v >= 10 ? 'mid' : 'low'; }
+    function getBarColor(v)   { return v >= 14 ? 'var(--accent-green)' : v >= 10 ? 'var(--accent)' : 'var(--accent-red)'; }
+
+    // ===================== TASKS =====================
+    function addTask() {
+        const text = document.getElementById('taskInput').value.trim();
+        if (text) {
+            data.tasks.push({ text, done: false });
+            document.getElementById('taskInput').value = '';
+            saveData();
+            showToast('✓ Tâche ajoutée');
+        }
+    }
+
+    document.getElementById('taskInput').addEventListener('keypress', e => { if (e.key === 'Enter') addTask(); });
+
+    function toggleTask(idx) { data.tasks[idx].done = !data.tasks[idx].done; saveData(); }
+    function deleteTask(idx) { data.tasks.splice(idx, 1); saveData(); }
+
+    // ===================== RESOURCES V2 =====================
+
+    const UE_COLORS = {
+        ue1: '#6366F1',
+        ue2: '#06B6D4',
+        ue3: '#A855F7',
+        ue4: '#F59E0B'
+    };
+
+    const UE_NAMES = {
+        ue1: 'Sciences Fondamentales',
+        ue2: 'Énergie & Climat',
+        ue3: 'Technologies & Langages',
+        ue4: 'Projet Personnel'
+    };
+
+    let activeResUE = 'all';
+    // activeFilter already declared above
+
+    function updateResModuleSelect() {
+        const ueId = document.getElementById('resUE').value;
+        const sel = document.getElementById('resModule');
+        sel.innerHTML = '<option value="">— Matière —</option>';
+        UE_MODULES[ueId].forEach(m => {
+            sel.innerHTML += `<option value="${m.id}">${m.name}</option>`;
+        });
+    }
+
+    function addResource() {
+        const ueId    = document.getElementById('resUE').value;
+        const moduleId = document.getElementById('resModule').value;
+        const category = document.getElementById('resCategory').value;
+        const title   = document.getElementById('resTitle').value.trim();
+        const link    = document.getElementById('resLink').value.trim();
+
+        if (!moduleId) { showToast('⚠️ Sélectionne une matière'); return; }
+        if (!title)    { showToast('⚠️ Entre un titre'); return; }
+        if (!link)     { showToast('⚠️ Entre un lien'); return; }
+
+        const mod = UE_MODULES[ueId].find(m => m.id === moduleId);
+        data.resources.push({ ueId, moduleId, moduleName: mod.name, category, title, link });
+        document.getElementById('resTitle').value = '';
+        document.getElementById('resLink').value  = '';
+        saveData();
+        showToast('✓ Ressource ajoutée');
+    }
+
+    function deleteResource(idx) {
+        data.resources.splice(idx, 1);
+        saveData();
+        showToast('✓ Ressource supprimée');
+    }
+
+    function filterResources(category, btn) {
+        activeFilter = category;
+        document.querySelectorAll('#resCatFilters .filter-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        renderResources();
+    }
+
+    function filterResUE(ueId, btn) {
+        activeResUE = ueId;
+        document.querySelectorAll('.res-ue-tab').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        renderResources();
+    }
+
+    function toggleResUEBlock(ueId) {
+        const block = document.getElementById('res-ue-block-' + ueId);
+        if (block) block.classList.toggle('collapsed');
+    }
+
+    function toggleResModuleBlock(blockId) {
+        const block = document.getElementById(blockId);
+        if (block) block.classList.toggle('collapsed');
+    }
+
+    function renderResources() {
+        const list = document.getElementById('resourcesList');
+        if (!list) return;
+
+        const searchVal = (document.getElementById('resSearch')?.value || '').toLowerCase();
+
+        // Filtre de base
+        let filtered = data.resources.map((r, idx) => ({ ...r, _idx: idx }));
+        if (activeResUE !== 'all') filtered = filtered.filter(r => r.ueId === activeResUE);
+        if (activeFilter !== 'all') filtered = filtered.filter(r => r.category === activeFilter);
+        if (searchVal) filtered = filtered.filter(r =>
+            r.title.toLowerCase().includes(searchVal) ||
+            (r.moduleName || '').toLowerCase().includes(searchVal)
+        );
+
+        // Update tab counts
+        ['all','ue1','ue2','ue3','ue4'].forEach(ueId => {
+            const el = document.getElementById('res-count-' + ueId);
+            if (!el) return;
+            const base = data.resources.filter(r => ueId === 'all' || r.ueId === ueId);
+            el.textContent = base.length;
+        });
+
+        if (filtered.length === 0) {
+            list.innerHTML = `
+                <div class="res-empty-ue">
+                    <div class="res-empty-ue-icon">📭</div>
+                    <div class="res-empty-ue-text">Aucune ressource trouvée</div>
+                    <div class="res-empty-ue-sub">Ajoute ta première ressource via le formulaire ci-dessus</div>
+                </div>`;
+            return;
+        }
+
+        // Regrouper par UE puis par module
+        const ueOrder = ['ue1','ue2','ue3','ue4'];
+        const byUE = {};
+        ueOrder.forEach(ueId => { byUE[ueId] = {}; });
+        filtered.forEach(r => {
+            const ueId = r.ueId || 'ue1';
+            const modId = r.moduleId || '__none__';
+            if (!byUE[ueId]) byUE[ueId] = {};
+            if (!byUE[ueId][modId]) byUE[ueId][modId] = [];
+            byUE[ueId][modId].push(r);
+        });
+
+        let html = '';
+
+        ueOrder.forEach(ueId => {
+            const mods = byUE[ueId];
+            if (Object.keys(mods).length === 0) return;
+            const color = UE_COLORS[ueId];
+            const ueName = UE_NAMES[ueId];
+            const ueCount = Object.values(mods).flat().length;
+
+            html += `
+                <div class="res-ue-block" id="res-ue-block-${ueId}">
+                    <div class="res-ue-header" onclick="toggleResUEBlock('${ueId}')">
+                        <div class="res-ue-stripe" style="background: ${color};"></div>
+                        <div class="res-ue-header-info">
+                            <div class="res-ue-header-code" style="color: ${color};">${ueId.toUpperCase()}</div>
+                            <div class="res-ue-header-name">${ueName}</div>
+                        </div>
+                        <div class="res-ue-header-stats">
+                            <span class="res-ue-badge">${ueCount} ressource${ueCount > 1 ? 's' : ''}</span>
+                            <span class="res-ue-badge">${Object.keys(mods).length} matière${Object.keys(mods).length > 1 ? 's' : ''}</span>
+                        </div>
+                        <span class="res-ue-chevron">▼</span>
+                    </div>
+                    <div class="res-ue-body">
+            `;
+
+            // Modules dans cet UE
+            const modOrder = UE_MODULES[ueId].map(m => m.id);
+            const sortedMods = Object.keys(mods).sort((a, b) => {
+                const ia = modOrder.indexOf(a), ib = modOrder.indexOf(b);
+                return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+            });
+
+            sortedMods.forEach(modId => {
+                const items = mods[modId];
+                const modInfo = UE_MODULES[ueId]?.find(m => m.id === modId);
+                const modName = modInfo?.name || items[0]?.moduleName || 'Autre';
+                const modSem  = modInfo?.sem || '';
+                const blockId = `res-mod-${ueId}-${modId}`;
+
+                // Initiales du module pour l'icône
+                const initials = modName.split(' ').filter(w => w.length > 2).slice(0,2).map(w => w[0].toUpperCase()).join('') || modName.substring(0,2).toUpperCase();
+
+                html += `
+                    <div class="res-module-block" id="${blockId}">
+                        <div class="res-module-header" onclick="toggleResModuleBlock('${blockId}')">
+                            <div class="res-module-icon" style="background: ${color};">${initials}</div>
+                            <div class="res-module-name">${modName}</div>
+                            ${modSem ? `<div class="res-module-sem">${modSem}</div>` : ''}
+                            <div class="res-module-count">${items.length} doc${items.length > 1 ? 's' : ''}</div>
+                            <span class="res-module-chevron">▾</span>
+                        </div>
+                        <div class="res-module-body">
+                `;
+
+                items.forEach(r => {
+                    const cat = RESOURCE_CATEGORIES[r.category] || RESOURCE_CATEGORIES.autre;
+                    html += `
+                        <div class="res-row">
+                            <span class="res-cat-pill" style="background: ${cat.color}20; color: ${cat.color}; border: 1px solid ${cat.color}40;">
+                                ${cat.icon} ${cat.label}
+                            </span>
+                            <span class="res-row-title" title="${r.title}">${r.title}</span>
+                            <a class="res-row-open" href="${r.link}" target="_blank" rel="noopener">
+                                Ouvrir ↗
+                            </a>
+                            <button class="btn btn-danger" onclick="deleteResource(${r._idx})" style="padding: 6px 10px; font-size: 0.75rem;">✕</button>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+            });
+
+            html += `</div></div>`;
+        });
+
+        list.innerHTML = html;
+    }
+
+    // ===================== TODAY SCHEDULE =====================
+    function renderTodaySchedule() {
+        const container = document.getElementById('todaySchedule');
+        if (!container) return;
+        const todayStr = toLocalDateString(new Date());
+        const courses = data.schedule.filter(c => c.date === todayStr).sort((a,b) => a.timeStart.localeCompare(b.timeStart));
+        if (courses.length === 0) {
+            container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-tertiary);">Aucun cours programmé aujourd\'hui</div>';
+            return;
+        }
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        let nextCourseFound = false;
+        let html = '';
+        courses.forEach(c => {
+            const [sH, sM] = c.timeStart.split(':').map(Number);
+            const [eH, eM] = c.timeEnd.split(':').map(Number);
+            const startMin = sH * 60 + sM;
+            const endMin = eH * 60 + eM;
+            const until = startMin - currentMinutes;
+            let badge = '', itemClass = '';
+            if (currentMinutes >= startMin && currentMinutes < endMin) {
+                badge = `<span class="time-badge current">🔴 EN COURS (${endMin - currentMinutes} min)</span>`;
+                itemClass = 'current';
+            } else if (until > 0 && until <= 60 && !nextCourseFound) {
+                if (until < 10)      badge = `<span class="time-badge soon">⚠️ Dans ${until} min !</span>`;
+                else if (until < 30) badge = `<span class="time-badge upcoming">⏰ Dans ${until} min</span>`;
+                else                 badge = `<span class="time-badge upcoming">⏳ Dans ${until} min</span>`;
+                itemClass = 'next'; nextCourseFound = true;
+            } else if (until > 60) {
+                const h = Math.floor(until / 60), m = until % 60;
+                badge = `<span class="time-badge later">Dans ${h}h${m > 0 ? String(m).padStart(2,'0') : ''}</span>`;
+            }
+            html += `
+                <div class="course-item ${itemClass}">
+                    <div class="course-time-block">
+                        <div class="course-start">${c.timeStart}</div>
+                        <div class="course-end">${c.timeEnd}</div>
+                    </div>
+                    <div class="course-details">
+                        <div class="course-header">
+                            <div class="course-title">${c.course}</div>
+                            ${badge}
+                        </div>
+                        ${c.location ? `<div style="font-size:0.8rem;color:var(--text-secondary);margin-top:4px;">📍 ${c.location}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        setTimeout(renderTodaySchedule, 60000);
+    }
+
+    // ===================== REFRESH UI =====================
+    function saveData() {
+        localStorage.setItem('studentDataV3', JSON.stringify(data));
+        refreshUI();
+    }
+
+    function refreshUI() {
+        const ueAverages = {};
+        let grandTotal = 0, grandCount = 0;
+
+        ['ue1','ue2','ue3','ue4'].forEach(ueId => {
+            let total = 0, count = 0;
+            UE_MODULES[ueId].forEach(mod => {
+                const grades = data.grades.filter(g => g.ueId === ueId && g.moduleId === mod.id);
+                if (grades.length > 0) {
+                    const avg = grades.reduce((s, g) => s + g.value, 0) / grades.length;
+                    total += avg; count++;
+                }
+            });
+            ueAverages[ueId] = count > 0 ? (total / count).toFixed(2) : null;
+            if (count > 0) { grandTotal += total / count; grandCount++; }
+        });
+
+        const globalAvg = grandCount > 0 ? (grandTotal / grandCount).toFixed(2) : null;
+        document.getElementById('global-avg').textContent = globalAvg || '—';
+        document.getElementById('global-bar').style.width = globalAvg ? `${(globalAvg / 20) * 100}%` : '0%';
+        document.getElementById('total-grades').textContent = data.grades.length;
+        document.getElementById('pending-tasks').textContent = data.tasks.filter(t => !t.done).length;
+
+        ['ue1','ue2','ue3','ue4'].forEach(ueId => {
+            const avg = ueAverages[ueId];
+            const el = document.getElementById('dash-' + ueId);
+            const avgEl = document.getElementById('avg-' + ueId);
+            if (el) { el.textContent = avg || '—'; el.style.color = avg ? getBarColor(parseFloat(avg)) : 'var(--text-tertiary)'; }
+            if (avgEl) { avgEl.textContent = avg ? `${avg} /20` : '—'; avgEl.style.color = avg ? getBarColor(parseFloat(avg)) : 'var(--text-tertiary)'; }
+        });
+
+        renderTodaySchedule();
+
+        ['ue1','ue2','ue3','ue4'].forEach(ueId => {
+            const container = document.getElementById('modules-' + ueId);
+            if (!container) return;
+            container.innerHTML = '';
+            UE_MODULES[ueId].forEach(mod => {
+                const grades = data.grades.map((g, idx) => ({...g, idx})).filter(g => g.ueId === ueId && g.moduleId === mod.id);
+                let chips = '';
+                let modAvg = null;
+                if (grades.length === 0) {
+                    chips = '<span style="color:var(--text-tertiary);font-size:0.8rem;">Aucune note</span>';
+                } else {
+                    modAvg = grades.reduce((s, g) => s + g.value, 0) / grades.length;
+                    grades.forEach(g => {
+                        chips += `<span class="grade-chip ${getGradeClass(g.value)}"><span class="grade-type">${g.type}</span><span>${g.value}</span><span class="grade-del" onclick="deleteGrade(${g.idx})">✕</span></span>`;
+                    });
+                }
+                const avgD = modAvg ? modAvg.toFixed(1) : '—';
+                const color = modAvg ? getBarColor(modAvg) : 'var(--border)';
+                const barW = modAvg ? `${(modAvg/20)*100}%` : '0%';
+                container.innerHTML += `
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-name">${mod.name}</div>
+                            <div class="module-sem">${mod.sem}</div>
+                        </div>
+                        <div class="module-grades">${chips}</div>
+                        <div class="module-average">
+                            <span class="avg-label">moy.</span>
+                            <div class="avg-bar"><div class="avg-bar-fill" style="width:${barW};background:${color};"></div></div>
+                            <span class="avg-value" style="color:${color}">${avgD}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+
+        const taskList = document.getElementById('taskList');
+        taskList.innerHTML = data.tasks.length === 0
+            ? '<div style="padding: 40px; text-align: center; color: var(--text-tertiary);">Aucune tâche</div>'
+            : data.tasks.map((t, i) => `
+                <div class="task-item ${t.done ? 'done' : ''}">
+                    <div class="task-check" onclick="toggleTask(${i})">${t.done ? '✓' : ''}</div>
+                    <div class="task-text" onclick="toggleTask(${i})">${t.text}</div>
+                    <button class="btn btn-danger" onclick="deleteTask(${i})">✕</button>
+                </div>
+              `).join('');
+
+        renderSchedule();
+        renderResources();
+    }
+
+    // ===================== NAV / THEME / TOAST =====================
+    function showSection(id, btn) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.closest('.nav-btn').classList.add('active');
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.style.display = 'block';
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    let theme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+
+    function toggleTheme() {
+        theme = theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        document.getElementById('theme-icon').textContent = theme === 'dark' ? '🌙' : '☀️';
+        document.getElementById('theme-text').textContent = theme === 'dark' ? 'Mode Sombre' : 'Mode Clair';
+    }
+
+    // ===================== INIT =====================
+    updateModuleSelect();
+    updateResModuleSelect();
+    refreshUI();
+    updateICSStatus();
+    document.getElementById('theme-icon').textContent = theme === 'dark' ? '🌙' : '☀️';
+    document.getElementById('theme-text').textContent = theme === 'dark' ? 'Mode Sombre' : 'Mode Clair';
+    </script>
+</body>
+</html>
