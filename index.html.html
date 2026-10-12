@@ -163,17 +163,49 @@ input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0
 .course-slot .course-location{font-size:.75rem;color:var(--text-tertiary)}
 #toast{position:fixed;bottom:32px;right:32px;background:var(--bg-card);border:1px solid var(--border-focus);border-radius:12px;padding:16px 24px;box-shadow:var(--glow);display:none;z-index:1000;animation:fadeIn .3s ease}
 @media(max-width:1024px){nav{width:240px}main{margin-left:240px}}
-@media(max-width:768px){nav{transform:translateX(-100%)}main{margin-left:0;padding:24px}.stats-grid,.ue-overview,.schedule-grid{grid-template-columns:1fr}}
+.nav-label{display:inline}
+@media(max-width:768px){
+  body{display:block;padding-bottom:84px}
+  /* Barre de navigation en bas */
+  nav{top:auto;left:0;right:0;bottom:0;width:100%;height:auto;flex-direction:row;align-items:stretch;justify-content:space-around;gap:4px;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));border-right:none;border-top:1px solid var(--border)}
+  .nav-logo,.nav-section{display:none}
+  .nav-btn{flex:1;flex-direction:column;justify-content:center;gap:2px;padding:8px 2px;margin:0;font-size:.62rem;text-align:center;border-radius:10px;min-width:0}
+  .nav-btn::before{display:none}
+  .nav-btn:hover{transform:none}
+  .nav-icon{font-size:1.25rem;width:auto}
+  .nav-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .theme-toggle{margin:0;padding:8px 10px;flex:0 0 auto;justify-content:center;border-radius:10px}
+  .theme-label{font-size:1.2rem}
+  #theme-text,.toggle-switch{display:none}
+  /* Contenu */
+  main{margin-left:0;padding:20px 16px}
+  .page-header{margin-bottom:24px}
+  .page-title{font-size:2rem}
+  .page-description{font-size:.95rem}
+  .card{padding:18px;border-radius:16px}
+  .stats-grid,.ue-overview,.schedule-grid{grid-template-columns:1fr}
+  .stat-card{padding:20px}
+  .stat-value{font-size:2.4rem}
+  .form-row>*{width:100%!important;flex:1 1 100%;min-width:0}
+  .modules-grid{grid-template-columns:minmax(0,1fr)}
+  .ue-tabs{grid-template-columns:1fr}
+  .year-btn{min-width:100%}
+  .week-nav{flex-direction:column;padding:16px}
+  .week-nav .btn{width:100%;justify-content:center}
+  .resource-item{flex-wrap:wrap}
+  .course-item{padding:12px}
+  #toast{bottom:96px;right:16px;left:16px;text-align:center}
+}
 </style>
 </head>
 <body>
 <nav>
   <div class="nav-logo"><div class="nav-logo-icon">🎓</div><div class="nav-logo-text">ESME<span>Pro</span></div></div>
   <div class="nav-section">Navigation</div>
-  <button class="nav-btn active" onclick="showSection('dashboard',this)"><span class="nav-icon">◆</span>Tableau de bord</button>
-  <button class="nav-btn" onclick="showSection('grades',this)"><span class="nav-icon">◈</span>Notes & Moyennes</button>
-  <button class="nav-btn" onclick="showSection('schedule',this)"><span class="nav-icon">◧</span>Emploi du temps</button>
-  <button class="nav-btn" onclick="showSection('resources',this)"><span class="nav-icon">◪</span>Ressources</button>
+  <button class="nav-btn active" onclick="showSection('dashboard',this)"><span class="nav-icon">◆</span><span class="nav-label">Accueil</span></button>
+  <button class="nav-btn" onclick="showSection('grades',this)"><span class="nav-icon">◈</span><span class="nav-label">Notes</span></button>
+  <button class="nav-btn" onclick="showSection('schedule',this)"><span class="nav-icon">◧</span><span class="nav-label">Planning</span></button>
+  <button class="nav-btn" onclick="showSection('resources',this)"><span class="nav-icon">◪</span><span class="nav-label">Ressources</span></button>
   <div class="theme-toggle" onclick="toggleTheme()">
     <div class="theme-label"><span id="theme-icon">🌙</span><span id="theme-text">Mode Sombre</span></div>
     <div class="toggle-switch"></div>
